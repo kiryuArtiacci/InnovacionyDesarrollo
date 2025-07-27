@@ -74,7 +74,6 @@ def check_forest_cover(lat, lon, radius_m=50):
 
 # <<<--- FUNCIÓN CORREGIDA PARA LA API DE GBIF ---<<<
 def check_prey_availability(lat, lon, radius_km=10):
-    """Verifica presas usando un polígono WKT cuadrado, que es más robusto."""
     # Convertir radio en km a grados de latitud/longitud (aproximación)
     deg_radius_lat = radius_km / 111.0
     deg_radius_lon = radius_km / (111.0 * np.cos(np.deg2rad(lat)))
@@ -168,7 +167,6 @@ class App:
     def __init__(self, root):
         self.root = root
         self.root.title("Nest-Guesser")
-        # (El resto del __init__ no cambia)
         self.root.geometry("450x500")
         if not self.setup_csv():
             self.root.destroy()
@@ -181,7 +179,6 @@ class App:
             self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
             self.process_generation_queue()
 
-    # (setup_csv, _get_next_id, create_widgets, guardar_ubicacion no cambian)
     def setup_csv(self):
         HEADER = [
             "id",
@@ -301,7 +298,6 @@ class App:
         self.entry_lon.delete(0, tk.END)
         self.entry_comentario.delete(0, tk.END)
 
-    # <<<--- FUNCIÓN generar_mapa_completo MODIFICADA ---<<<
     def generar_mapa_completo(self):
         df = self.leer_datos()
         m = self.generar_mapa_base(df)  # Obtiene el mapa con las capas base
@@ -338,15 +334,12 @@ class App:
                     icon=folium.Icon(color=color, icon=icon, prefix="glyphicon"),
                 ).add_to(mc)
 
-        # <<<--- EL LAYER CONTROL SE AÑADE AQUÍ, AL FINAL ---<<<
-        # Esto asegura que detecte todas las capas: las base y la de marcadores.
         folium.LayerControl().add_to(m)
 
         map_path = os.path.realpath("mapa_gestion_aguilas.html")
         m.save(map_path)
         webbrowser.open(f"file://{map_path}")
 
-    # (generar_y_validar_ubicaciones_threaded, process_generation_queue, etc. no cambian)
     def generar_y_validar_ubicaciones_threaded(self, num_gen, q):
         df = self.leer_datos()
         nidos = df[df["tipo"] == "Nido probable"].copy()
@@ -534,7 +527,6 @@ class App:
 
         m = folium.Map(location=map_center, zoom_start=zoom_start, tiles=None)
 
-        # Añadimos las capas base
         folium.TileLayer("OpenStreetMap", name="Estándar (Calles)").add_to(m)
         folium.TileLayer(
             "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -551,8 +543,6 @@ class App:
             attr="CartoDB",
             name="Modo Oscuro",
         ).add_to(m)
-
-        # YA NO AÑADIMOS EL LAYER CONTROL AQUÍ
 
         folium.LatLngPopup().add_to(m)
         return m
